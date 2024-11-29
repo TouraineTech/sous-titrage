@@ -78,6 +78,14 @@
     <script>
       const SAMPLE_RATE = 48000;
 
+      const queryParams = new URLSearchParams(window.location.search);
+      const gladiaKey = queryParams.get("token");
+      if (!gladiaKey) {
+        window.alert(
+          'Append your API token to query param "token": "?token=aaaa-bbbb-cccc-dddd".\nYou can get one for free at https://app.gladia.io/\nYou can add a source language with "source_language" and a target language with "target_language".\nto perform a realtime translation.\nthe url should look like subtitles.gladia.io/?token=aaaa-bbbb-cccc-dddd&source_language=french&target_language=english\nfor example to translate from french to english.'
+        );
+        return;
+      }
       /**
        * @returns {{promise: Promise<any>; resolve(value: any): void; reject(err: any): void;}}
        */
@@ -153,6 +161,10 @@
           },
           body: JSON.stringify({
             sample_rate: SAMPLE_RATE,
+            "language_config": {
+              "languages": ["fr", "en"], // You can now specify the expected languages in V2 as guidance to improve accuracy and latency
+              "code_switching": true
+            }
           }),
         })
         if (!response.ok) {
@@ -180,7 +192,6 @@
 
         // Parse submitted data
         const formData = new FormData(form);
-        const gladiaKey = formData.get('gladia_key');
         const inputDevice = formData.get('input_device');
 
         // Update the UI
