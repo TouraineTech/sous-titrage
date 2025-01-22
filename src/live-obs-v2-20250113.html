@@ -111,7 +111,13 @@
                         languages: ["fr"]
                     },
                     endpointing: 0.01,
-                    maximum_duration_without_endpointing: 5
+                    maximum_duration_without_endpointing: 5,
+                    realtime_processing: {
+                        custom_vocabulary: true,
+                        custom_vocabulary_config: {
+                            vocabulary: ["Touraine Tech"]
+                        }
+                    }
                 }),
             })
             if (!response.ok) {
@@ -279,16 +285,31 @@
             socket.onmessage = (event) => {
                 const message = JSON.parse(event.data);
                 if (message?.type === 'transcript' && message?.data?.is_final) {
-                    console.log(message, message.data.utterance.text);
-                    const transcriptId = seqId++;
-                    const transcriptContainer = document.createElement("div");
-                    transcriptContainer.setAttribute("id", transcriptId);
-                    resultContainer.appendChild(transcriptContainer);
+
+                    if (
+                        ![
+                            "Bye, Bye!",
+                            "Let's see! Let's see!",
+                            "Thank you.",
+                            "Merci.",
+                            "Salut!",
+                            "Come on!",
+                            "Thank you and competence.",
+                            "Thanks'",
+                            "thank you for watching",
+                            "Let's get going.",
+                        ].includes(message.data.utterance.text)
+                    ) {
+                        //console.log(message, message.data.utterance.text);
+                        const transcriptId = seqId++;
+                        const transcriptContainer = document.createElement("div");
+                        transcriptContainer.setAttribute("id", transcriptId);
+                        resultContainer.appendChild(transcriptContainer);
 
 
-                    transcriptContainer.textContent = message.data.utterance.text;
-                    updateScroll();
-
+                        transcriptContainer.textContent = message.data.utterance.text;
+                        updateScroll();
+                    }
                 }
             };
 
